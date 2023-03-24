@@ -1,23 +1,21 @@
-import com.codeborne.selenide.SelenideElement;
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
-import org.openqa.selenium.NoSuchElementException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 public class BaaqmdLogosAreVisibleTest {
-    BaamqdPage baaqmdPage = new BaamqdPage();
+    // go to sitemap, collect links, execute every link
+    private static BaamqdPage baaqmdPage = new BaamqdPage();
 
-    @Test
-    public void Execute() {
-        for (String link: baaqmdPage.siteMapLinks){
-            SelenideElement topLogoImgEl = baaqmdPage.BaaqmdLogo(link);
-            try {
-                Assert.assertEquals(topLogoImgEl.getAttribute("src"), baaqmdPage.Src);
-            } catch (NoSuchElementException e) {
-                System.out.println("An exception occurred while executing the test for link: " + link);
-//                e.printStackTrace();
-            } finally {
-                continue;
-            }
-        }
+    private static Stream<String> getLinksFromSitemap() {
+        return Stream.of(baaqmdPage.GetLinksFromSitemap());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getLinksFromSitemap")
+    public void logoExistsOnPage(String link) {
+        BaamqdPage newPage = new BaamqdPage(link);
+        Assertions.assertTrue(newPage.IsLogoExists());
     }
 }
